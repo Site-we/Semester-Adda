@@ -20,7 +20,6 @@
             justify-content: center;
             height: 100vh;
             width: 100%;
-            padding: 0;
             overflow: hidden; /* Prevents scrollbars from appearing */
         }
 
@@ -45,13 +44,14 @@
             color: red;
             font-size: 1.2rem;
             margin-top: 20px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
     <div class="video-container">
-        <iframe id="dailymotionPlayer" allowfullscreen allow="autoplay"></iframe>
+        <iframe id="videoPlayer" allowfullscreen allow="autoplay"></iframe>
     </div>
 
     <p id="errorMessage" class="error-message"></p>
@@ -62,7 +62,7 @@
 
         // Define the text file that contains the video URL
         const videoTextFile = `lecture${lectureNumber}.txt`;
-        const dailymotionPlayer = document.getElementById('dailymotionPlayer');
+        const videoPlayer = document.getElementById('videoPlayer');
 
         // Function to fetch the video URL from the text file
         async function fetchVideoURL() {
@@ -72,22 +72,30 @@
                     throw new Error("Video not updated yet.");
                 }
                 const videoURL = await response.text();
-
-                // Trim whitespace and extract Dailymotion video ID
                 const trimmedURL = videoURL.trim();
-                const videoIDMatch = trimmedURL.match(/dailymotion\.com\/video\/([a-zA-Z0-9]+)/);
 
-                if (videoIDMatch && videoIDMatch[1]) {
-                    const videoID = videoIDMatch[1];
-                    dailymotionPlayer.src = `https://www.dailymotion.com/embed/video/${videoID}`;
-                    
-                    // Ensure the video is unmuted by default
-                    dailymotionPlayer.onload = () => {
-                        dailymotionPlayer.contentWindow.postMessage('{"method":"setVolume","value":1}', '*');
-                    };
-                } else {
-                    throw new Error("Invalid Dailymotion URL format.");
+                if (trimmedURL.includes("dailymotion.com/video/")) {
+                    // Extract Dailymotion video ID
+                    const videoIDMatch = trimmedURL.match(/dailymotion\.com\/video\/([a-zA-Z0-9]+)/);
+                    if (videoIDMatch && videoIDMatch[1]) {
+                        videoPlayer.src = `https://www.dailymotion.com/embed/video/${videoIDMatch[1]}`;
+                    } else {
+                        throw new Error("Invalid Dailymotion URL format.");
+                    }
+                } 
+                else if (trimmedURL.includes("drive.google.com/file/d/")) {
+                    // Extract Google Drive video ID
+                    const driveIDMatch = trimmedURL.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+                    if (driveIDMatch && driveIDMatch[1]) {
+                        videoPlayer.src = `https://drive.google.com/file/d/${driveIDMatch[1]}/preview`;
+                    } else {
+                        throw new Error("Invalid Google Drive URL format.");
+                    }
+                } 
+                else {
+                    throw new Error("Unsupported video link.");
                 }
+
             } catch (error) {
                 document.getElementById('errorMessage').textContent = error.message;
             }
