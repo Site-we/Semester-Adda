@@ -20,7 +20,7 @@
             justify-content: center;
             height: 100vh;
             width: 100%;
-            overflow: hidden;
+            overflow: hidden; /* Prevents scrollbars from appearing */
         }
 
         /* Video Container */
@@ -31,25 +31,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
         }
 
         iframe {
             width: 100%;
             height: 100%;
             border: none;
-            pointer-events: none; /* Disable interactions */
-        }
-
-        /* Overlay to prevent controls from appearing */
-        .overlay {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            background: transparent;
-            z-index: 2; /* Ensures it covers the video */
+            object-fit: contain; /* Ensures the video scales properly without cropping */
         }
 
         .error-message {
@@ -57,53 +45,82 @@
             font-size: 1.2rem;
             margin-top: 20px;
             text-align: center;
-            position: absolute;
-            bottom: 10px;
         }
     </style>
 </head>
 <body>
 
     <div class="video-container">
-        <iframe id="videoPlayer" allow="autoplay"></iframe>
-        <div class="overlay"></div> <!-- Prevents interaction with video -->
+        <iframe id="videoPlayer" allowfullscreen allow="autoplay"></iframe>
     </div>
 
     <p id="errorMessage" class="error-message"></p>
 
     <script>
+        // Get the selected lecture number from local storage
         const lectureNumber = localStorage.getItem('selectedLecture');
+
+        // Define the text file that contains the video URL
         const videoTextFile = `lecture${lectureNumber}.txt`;
         const videoPlayer = document.getElementById('videoPlayer');
 
+        // Function to fetch the video URL from the text file
         async function fetchVideoURL() {
             try {
                 const response = await fetch(videoTextFile);
-                if (!response.ok) throw new Error("Video not updated yet.");
+                if (!response.ok) {
+                    throw new Error("Video not updated yet.");
+                }
+                const videoURL = await response.text();
+                const trimmedURL = videoURL.trim();
 
-                const videoURL = (await response.text()).trim();
-
-                if (videoURL.includes("drive.google.com/file/d/")) {
-                    const driveIDMatch = videoURL.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+                if (trimmedURL.includes("dailymotion.com/video/")) {
+                    // Extract Dailymotion video ID
+                    const videoIDMatch = trimmedURL.match(/dailymotion\.com\/video\/([a-zA-Z0-9]+)/);
+                    if (videoIDMatch && videoIDMatch[1]) {
+                        videoPlayer.src = `https://www.dailymotion.com/embed/video/${videoIDMatch[1]}`;
+                    } else {
+                        throw new Error("Invalid Dailymotion URL format.");
+                    }
+                } 
+                else if (trimmedURL.includes("drive.google.com/file/d/")) {
+                    // Extract Google Drive video ID
+                    const driveIDMatch = trimmedURL.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
                     if (driveIDMatch && driveIDMatch[1]) {
-                        videoPlayer.src = `https://drive.google.com/file/d/${driveIDMatch[1]}/preview?autoplay=1&mute=1`;
+                        videoPlayer.src = `https://drive.google.com/file/d/${driveIDMatch[1]}/preview`;
                     } else {
                         throw new Error("Invalid Google Drive URL format.");
                     }
-                } else {
+                } 
+                else {
                     throw new Error("Unsupported video link.");
                 }
+
             } catch (error) {
                 document.getElementById('errorMessage').textContent = error.message;
             }
         }
 
+        // Load the video URL
         fetchVideoURL();
 
-        // Disable context menu & touch actions
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('mousedown', e => { if (e.detail > 1) e.preventDefault(); });
-        document.addEventListener('touchstart', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+        // Disable context menu popup on long press
+        document.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+        });
+
+        // Disable long press detection to prevent vibration and popup
+        document.addEventListener('mousedown', function(event) {
+            if (event.detail > 1) {
+                event.preventDefault();
+            }
+        });
+
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
     </script>
 
 </body>
