@@ -63,6 +63,7 @@
         // Define the text file that contains the video URL
         const videoTextFile = `lecture${lectureNumber}.txt`;
         const videoPlayer = document.getElementById('videoPlayer');
+        let videoType = ""; // To track the video type
 
         // Function to fetch the video URL from the text file
         async function fetchVideoURL() {
@@ -78,6 +79,7 @@
                     // Extract Dailymotion video ID
                     const videoIDMatch = trimmedURL.match(/dailymotion\.com\/video\/([a-zA-Z0-9]+)/);
                     if (videoIDMatch && videoIDMatch[1]) {
+                        videoType = "dailymotion";
                         videoPlayer.src = `https://www.dailymotion.com/embed/video/${videoIDMatch[1]}`;
                     } else {
                         throw new Error("Invalid Dailymotion URL format.");
@@ -87,6 +89,7 @@
                     // Extract Google Drive video ID
                     const driveIDMatch = trimmedURL.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
                     if (driveIDMatch && driveIDMatch[1]) {
+                        videoType = "gdrive";
                         videoPlayer.src = `https://drive.google.com/file/d/${driveIDMatch[1]}/preview`;
                     } else {
                         throw new Error("Invalid Google Drive URL format.");
@@ -103,6 +106,43 @@
 
         // Load the video URL
         fetchVideoURL();
+
+        // Function to increase playback speed
+        function increasePlaybackSpeed() {
+            if (videoType === "dailymotion") {
+                videoPlayer.contentWindow.postMessage('{"method":"setPlaybackRate","value":2}', '*');
+            } else if (videoType === "gdrive") {
+                videoPlayer.contentWindow.postMessage({ event: 'command', func: 'playbackRate', args: [2] }, '*');
+            }
+        }
+
+        // Function to reset playback speed
+        function resetPlaybackSpeed() {
+            if (videoType === "dailymotion") {
+                videoPlayer.contentWindow.postMessage('{"method":"setPlaybackRate","value":1}', '*');
+            } else if (videoType === "gdrive") {
+                videoPlayer.contentWindow.postMessage({ event: 'command', func: 'playbackRate', args: [1] }, '*');
+            }
+        }
+
+        // Add event listeners for long press speed increase
+        let pressTimer;
+        function startLongPress() {
+            pressTimer = setTimeout(increasePlaybackSpeed, 500); // Activate after 500ms
+        }
+        function cancelLongPress() {
+            clearTimeout(pressTimer);
+            resetPlaybackSpeed();
+        }
+
+        // Apply event listeners for mouse and touch events
+        videoPlayer.addEventListener('mousedown', startLongPress);
+        videoPlayer.addEventListener('mouseup', cancelLongPress);
+        videoPlayer.addEventListener('mouseleave', cancelLongPress);
+
+        videoPlayer.addEventListener('touchstart', startLongPress);
+        videoPlayer.addEventListener('touchend', cancelLongPress);
+        videoPlayer.addEventListener('touchcancel', cancelLongPress);
 
         // Disable context menu popup on long press
         document.addEventListener('contextmenu', function(event) {
@@ -121,6 +161,7 @@
                 event.preventDefault();
             }
         }, { passive: false });
+
     </script>
 
 </body>
