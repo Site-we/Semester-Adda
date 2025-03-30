@@ -119,9 +119,6 @@
         }
     </style>
     <script>
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("sw1.js");
-        }
 
         async function checkAccess() {
             const urlParams = new URLSearchParams(window.location.search);
