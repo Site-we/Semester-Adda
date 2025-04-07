@@ -20,10 +20,28 @@
             border: none;
         }
     </style>
+    <script>
+        // Function to convert Google Drive link to embed link
+        function convertToEmbedLink(link) {
+            const regex = /\/file\/d\/(.*?)\/view/;
+            const match = link.match(regex);
+            if (match && match[1]) {
+                return `https://drive.google.com/embeddedfolderview?id=${match[1]}#list`;
+            }
+            return link;
+        }
+
+        // Your Google Drive link
+        const gdriveLink = "https://drive.google.com/file/d/10CUvJSy4G_5o6C9lcYHUQM0Tk2GpY6cH/view";
+        const embedLink = convertToEmbedLink(gdriveLink);
+
+        // Set the iframe source to the embed link
+        window.onload = function() {
+            document.getElementById("iframe-content").src = embedLink;
+        }
+    </script>
 </head>
 <body>
-    <iframe src="https://drive.google.com/embeddedfolderview?id=10CUvJSy4G_5o6C9lcYHUQM0Tk2GpY6cH#list" 
-            name="iframe-content">
-    </iframe>
+    <iframe id="iframe-content" name="iframe-content"></iframe>
 </body>
 </html>
