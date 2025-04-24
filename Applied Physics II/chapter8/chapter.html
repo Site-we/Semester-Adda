@@ -23,8 +23,13 @@
     <script>
         // Function to convert Google Drive link to embed link
         function convertToEmbedLink(link) {
-            const regex = /\/file\/d\/(.*?)\/view/;
-            const match = link.match(regex);
+            const fileRegex = /\/file\/d\/(.*?)\/view/;
+            const folderRegex = /\/folders\/(.*?)(\/|$)/;
+            let match = link.match(fileRegex);
+            if (match && match[1]) {
+                return `https://drive.google.com/embeddedfolderview?id=${match[1]}#list`;
+            }
+            match = link.match(folderRegex);
             if (match && match[1]) {
                 return `https://drive.google.com/embeddedfolderview?id=${match[1]}#list`;
             }
