@@ -23,8 +23,13 @@
     <script>
         // Function to convert Google Drive link to embed link
         function convertToEmbedLink(link) {
-            const regex = /\/file\/d\/(.*?)\/view/;
-            const match = link.match(regex);
+            const fileRegex = /\/file\/d\/(.*?)\/view/;
+            const folderRegex = /\/folders\/(.*?)(\/|$)/;
+            let match = link.match(fileRegex);
+            if (match && match[1]) {
+                return `https://drive.google.com/embeddedfolderview?id=${match[1]}#list`;
+            }
+            match = link.match(folderRegex);
             if (match && match[1]) {
                 return `https://drive.google.com/embeddedfolderview?id=${match[1]}#list`;
             }
@@ -32,7 +37,7 @@
         }
 
         // Your Google Drive link
-        const gdriveLink = "https://drive.google.com/drive/folders/1ZNscVh1M3nKDvqg6RRq6ALm1KHKCdRds";
+        const gdriveLink = "https://drive.google.com/drive/folders/1ZLwzsFaNF6NIXVjYpRPPA4TvsARPbe1s";
         const embedLink = convertToEmbedLink(gdriveLink);
 
         // Set the iframe source to the embed link
