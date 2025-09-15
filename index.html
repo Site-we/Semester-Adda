@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Semester Adda- Subjects</title>
     <style>
-        /* General Styling */
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #1d557d, #4a90e2);
@@ -14,11 +13,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column; /* Align items vertically */
+            flex-direction: column;
             height: 100vh;
         }
-
-        /* Container */
         .container {
             text-align: center;
             background: white;
@@ -27,29 +24,23 @@
             border-radius: 12px;
             max-width: 500px;
             animation: fadeIn 1s ease-in-out;
-            margin-bottom: 20px; /* Add margin for spacing */
+            margin-bottom: 20px;
         }
-
-        /* Heading */
         h1 {
             color: #1d557d;
             font-size: 2.2rem;
             margin-bottom: 10px;
         }
-
         p {
             color: #444;
             font-size: 1.1rem;
             margin-bottom: 20px;
         }
-
-        /* Subject Buttons */
         .folder-links {
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
-
         .folder-links a {
             display: block;
             background: #1d557d;
@@ -62,40 +53,34 @@
             transition: all 0.3s ease-in-out;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
         }
-
         .folder-links a:hover {
             background: #155370;
             transform: translateY(-3px);
         }
-
-        /* Error Message */
         .error-message {
             text-align: center;
             color: red;
             font-size: 1.2rem;
-            margin-bottom: 10px; /* Add margin to create space below the error message */
-            display: block; /* Ensure it's displayed as a block element */
-            margin-bottom: 20px; /* Add margin for spacing */
+            margin-bottom: 20px;
+            display: block;
         }
-    /* Share Username Button */
-    .share-button {
-        display: block;
-        background: #27ae60; /* Green */
-        color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-size: 1.2rem;
-        font-weight: 500;
-        transition: all 0.3s ease-in-out;
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-        margin-top: 10px;
-    }
-    .share-button:hover {
-        background: #1e8449;
-        transform: translateY(-3px);
-    }
-        /* Logout Button */
+        .share-button {
+            display: block;
+            background: #27ae60;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 500;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            margin-top: 10px;
+        }
+        .share-button:hover {
+            background: #1e8449;
+            transform: translateY(-3px);
+        }
         .logout-button {
             display: block;
             background: #e74c3c;
@@ -107,20 +92,16 @@
             font-weight: 500;
             transition: all 0.3s ease-in-out;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-            margin-top: 10px; /* Add margin to create space above the button */
+            margin-top: 10px;
         }
         .logout-button:hover {
             background: #c0392b;
             transform: translateY(-3px);
         }
-
-        /* Fade-in Animation */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Responsive Design */
         @media (max-width: 600px) {
             .container {
                 max-width: 90%;
@@ -139,18 +120,6 @@
         //if ("serviceWorker" in navigator) {
         //    navigator.serviceWorker.register("sw.js");
         //}
-        document.getElementById("share-button").addEventListener("click", () => {
-    const url = window.location.href;
-    if (navigator.share) {
-        navigator.share({
-            title: "Semester Adda Username",
-            text: "Here’s my Semester Adda username link:",
-            url: url
-        });
-    } else {
-        alert("Sharing not supported. Copy this link: " + url);
-    }
-});
         async function checkAccess() {
             const urlParams = new URLSearchParams(window.location.search);
             const query = urlParams.get("user");
@@ -167,13 +136,11 @@
             }
 
             try {
-                // Fetch users.json
-                const response = await fetch("users.json"); // Ensure this file is in the same directory
+                const response = await fetch("users.json");
                 if (!response.ok) throw new Error("Failed to load users.json");
 
                 const users = await response.json();
 
-                // Check if the query exists
                 if (!users.includes(query)) {
                     errorMessage.textContent = "Access Denied: User not found.";
                     errorMessage.style.display = "block";
@@ -182,7 +149,6 @@
                     return;
                 }
 
-                // If valid, show the main content
                 document.getElementById("content").style.display = "block";
 
             } catch (error) {
@@ -208,11 +174,26 @@
             links.forEach(link => {
                 link.addEventListener('click', saveSubjectAndNavigate);
             });
+
+            const shareButton = document.getElementById("share-button");
+            shareButton.addEventListener("click", (e) => {
+                e.preventDefault();
+                const urlParams = new URLSearchParams(window.location.search);
+                const username = urlParams.get("user") || "Unknown User";
+                if (navigator.share) {
+                    navigator.share({
+                        title: "Semester Adda Username",
+                        text: `My Semester Adda username: ${username}`
+                    }).catch(err => console.log("Share failed:", err));
+                } else {
+                    alert("Sharing not supported. Username: " + username);
+                }
+            });
         });
     </script>
 </head>
 <body>
-    <div id="error-message" class="error-message"></div> <!-- Move error message above main content -->
+    <div id="error-message" class="error-message"></div>
     <div id="content" class="container" style="display: none;">
         <h1>Welcome to Semester Adda</h1>
         <p>Select a Subject to Explore:</p>
