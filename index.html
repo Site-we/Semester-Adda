@@ -197,6 +197,18 @@
                 link.addEventListener('click', saveSubjectAndNavigate);
             });
         });
+        document.getElementById("share-button").addEventListener("click", () => {
+    const url = window.location.href;
+    if (navigator.share) {
+        navigator.share({
+            title: "Semester Adda Username",
+            text: "Here’s my Semester Adda username link:",
+            url: url
+        });
+    } else {
+        alert("Sharing not supported. Copy this link: " + url);
+    }
+});
     </script>
 </head>
 <body>
