@@ -16,6 +16,7 @@
             flex-direction: column;
             height: 100vh;
         }
+
         .container {
             text-align: center;
             background: white;
@@ -26,21 +27,25 @@
             animation: fadeIn 1s ease-in-out;
             margin-bottom: 20px;
         }
+
         h1 {
             color: #1d557d;
             font-size: 2.2rem;
             margin-bottom: 10px;
         }
+
         p {
             color: #444;
             font-size: 1.1rem;
             margin-bottom: 20px;
         }
+
         .folder-links {
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
+
         .folder-links a {
             display: block;
             background: #1d557d;
@@ -53,10 +58,12 @@
             transition: all 0.3s ease-in-out;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
         }
+
         .folder-links a:hover {
             background: #155370;
             transform: translateY(-3px);
         }
+
         .error-message {
             text-align: center;
             color: red;
@@ -64,6 +71,7 @@
             margin-bottom: 20px;
             display: block;
         }
+
         .share-button {
             display: block;
             background: #27ae60;
@@ -81,6 +89,7 @@
             background: #1e8449;
             transform: translateY(-3px);
         }
+
         .logout-button {
             display: block;
             background: #e74c3c;
@@ -98,10 +107,36 @@
             background: #c0392b;
             transform: translateY(-3px);
         }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Toast */
+        .toast {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s;
+        }
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 max-width: 90%;
@@ -129,7 +164,6 @@
 
             if (!query) {
                 errorMessage.textContent = "Access Denied: No User";
-                errorMessage.style.display = "block";
                 shareButton.style.display = "block";
                 logoutButton.style.display = "block";
                 return;
@@ -143,7 +177,6 @@
 
                 if (!users.includes(query)) {
                     errorMessage.textContent = "Access Denied: User not found.";
-                    errorMessage.style.display = "block";
                     shareButton.style.display = "block";
                     logoutButton.style.display = "block";
                     return;
@@ -153,7 +186,6 @@
 
             } catch (error) {
                 errorMessage.textContent = "Error loading users";
-                errorMessage.style.display = "block";
                 shareButton.style.display = "block";
                 logoutButton.style.display = "block";
             }
@@ -167,6 +199,15 @@
             window.location.href = subjectHref;
         }
 
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = "toast show";
+            setTimeout(() => {
+                toast.className = "toast";
+            }, 2500);
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             await checkAccess();
 
@@ -176,17 +217,16 @@
             });
 
             const shareButton = document.getElementById("share-button");
-            shareButton.addEventListener("click", (e) => {
+            shareButton.addEventListener("click", async (e) => {
                 e.preventDefault();
                 const urlParams = new URLSearchParams(window.location.search);
                 const username = urlParams.get("user") || "Unknown User";
-                if (navigator.share) {
-                    navigator.share({
-                        title: "Semester Adda Username",
-                        text: `My Semester Adda username: ${username}`
-                    }).catch(err => console.log("Share failed:", err));
-                } else {
-                    alert("Sharing not supported. Username: " + username);
+
+                try {
+                    await navigator.clipboard.writeText(username);
+                    showToast("Username copied: " + username);
+                } catch (err) {
+                    showToast("Failed to copy. Username: " + username);
                 }
             });
         });
@@ -205,7 +245,8 @@
             <a href="Computer Programming Using C/index.html">Computer Programming Using C</a>
         </div>
     </div>
-    <a id="share-button" class="share-button" href="#" style="display: none;">Share Username</a>
+    <a id="share-button" class="share-button" href="#" style="display: none;">Copy Username</a>
     <a id="logout-button" class="logout-button" href="logout.html" style="display: none;">Logout</a>
+    <div id="toast" class="toast"></div>
 </body>
 </html>
