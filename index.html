@@ -77,7 +77,24 @@
             display: block; /* Ensure it's displayed as a block element */
             margin-bottom: 20px; /* Add margin for spacing */
         }
-
+    /* Share Username Button */
+    .share-button {
+        display: block;
+        background: #27ae60; /* Green */
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 1.2rem;
+        font-weight: 500;
+        transition: all 0.3s ease-in-out;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        margin-top: 10px;
+    }
+    .share-button:hover {
+        background: #1e8449;
+        transform: translateY(-3px);
+    }
         /* Logout Button */
         .logout-button {
             display: block;
@@ -126,11 +143,13 @@
             const urlParams = new URLSearchParams(window.location.search);
             const query = urlParams.get("user");
             const errorMessage = document.getElementById("error-message");
+            const shareButton = document.getElementById("logout-button");
             const logoutButton = document.getElementById("logout-button");
 
             if (!query) {
                 errorMessage.textContent = "Access Denied: No User";
                 errorMessage.style.display = "block";
+                shareButton.style.display = "block";
                 logoutButton.style.display = "block";
                 return;
             }
@@ -146,6 +165,7 @@
                 if (!users.includes(query)) {
                     errorMessage.textContent = "Access Denied: User not found.";
                     errorMessage.style.display = "block";
+                    shareButton.style.display = "block";
                     logoutButton.style.display = "block";
                     return;
                 }
@@ -156,6 +176,7 @@
             } catch (error) {
                 errorMessage.textContent = "Error loading users";
                 errorMessage.style.display = "block";
+                shareButton.style.display = "block";
                 logoutButton.style.display = "block";
             }
         }
@@ -191,6 +212,7 @@
             <a href="Computer Programming Using C/index.html">Computer Programming Using C</a>
         </div>
     </div>
+    <a id="share-button" class="share-button" href="#" style="display: none;">Share Username</a>
     <a id="logout-button" class="logout-button" href="logout.html" style="display: none;">Logout</a>
 </body>
 </html>
