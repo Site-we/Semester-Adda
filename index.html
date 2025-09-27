@@ -170,7 +170,9 @@
             }
 
             try {
-                const response = await fetch("users.json");
+                const response = await fetch("https://nikhilkumar.free.nf/users.json", {
+                    cache: "no-store"
+                });
                 if (!response.ok) throw new Error("Failed to load users.json");
 
                 const users = await response.json();
