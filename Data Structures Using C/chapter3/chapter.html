@@ -21,6 +21,9 @@
         }
     </style>
     <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("sw.js");
+        }
         // Function to convert Google Drive link to embed link
         function convertToEmbedLink(link) {
             const fileRegex = /\/file\/d\/(.*?)\/view/;
