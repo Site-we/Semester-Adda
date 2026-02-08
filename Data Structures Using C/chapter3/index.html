@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Chapter 1</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+    <script>
+        // Function to convert Google Drive link to embed link
+        function convertToEmbedLink(link) {
+            const fileRegex = /\/file\/d\/(.*?)\/view/;
+            const folderRegex = /\/folders\/(.*?)(\/|$)/;
+            let match = link.match(fileRegex);
+            if (match && match[1]) {
+                return `https://drive.google.com/embeddedfolderview?id=${match[1]}#list`;
+            }
+            match = link.match(folderRegex);
+            if (match && match[1]) {
+                return `https://drive.google.com/embeddedfolderview?id=${match[1]}#list`;
+            }
+            return link;
+        }
+
+        // Your Google Drive link
+        const gdriveLink = "https://drive.google.com/drive/folders/1rC5EUhyy6onOaih3ulCtcehDDEVlwmYZ";
+        const embedLink = convertToEmbedLink(gdriveLink);
+
+        // Set the iframe source to the embed link
+        window.onload = function() {
+            document.getElementById("iframe-content").src = embedLink;
+        }
+    </script>
+</head>
+<body>
+    <iframe id="iframe-content" name="iframe-content"></iframe>
+</body>
+</html>
